@@ -1,0 +1,22 @@
+name: Release
+
+# A pushed tag publishes the tarball and pin a consumer installs from, with
+# x-lang's shared bundle release workflow.  A run started by hand rolls the
+# tag it is given and publishes nothing.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to roll (a dry run: publishes nothing)'
+        required: true
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    uses: jonruttan/x-lang/.github/workflows/bundle-release.yml@main
+    with:
+      tag: ${{ inputs.tag }}

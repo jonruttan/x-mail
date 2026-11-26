@@ -1,0 +1,13 @@
+; bundle.xon -- what this bundle is.
+
+(name "mail-client")
+
+; Helium: each module imports what it uses.
+(dialect he)
+
+(requires-release "v0.63.0")
+
+; Messages, MIME and the Maildir store.
+(requires-bundle "mail" "v0.1.0" "jonruttan/x-lib-mail")
+
+(entry run)
