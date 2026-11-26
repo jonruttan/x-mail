@@ -1,0 +1,50 @@
+#!/bin/sh
+# # x-mail -- a mail client on x-lang
+#
+# ## tests/spec-runner.sh -- the bundle's runner
+#
+# @description Sources the platform's spec runner; vendors nothing.
+# @author [Jon Ruttan](jonruttan@gmail.com)
+# @copyright 2026 Jon Ruttan
+# @license MIT No Attribution (MIT-0)
+#
+# No path reaches into an x-lang source tree; everything comes from x itself:
+# --share-dir says which tree x reads from (repo root in a checkout, share/x
+# when installed) and --engine-path says where the engine is.
+#
+# Set X to point at a particular x; otherwise the one on PATH is used.
+set -e
+
+BUNDLE="$(cd "$(dirname "$0")/.." && pwd)"
+X="${X:-x}"
+
+command -v "$X" >/dev/null 2>&1 || {
+	echo "x-mail: no x on PATH.  Set X=/path/to/x.sh and retry." >&2
+	exit 1
+}
+
+X_ROOT="$("$X" --share-dir)"
+X_BIN="${X_BIN:-$("$X" --engine-path)}"
+
+# The platform runner locates its harness relative to the engine binary, which
+# sits beside tests/ only in a checkout; a sourced script cannot portably find
+# its own path, so the caller sets this.
+SPEC_RUNNER_DIR="$X_ROOT/tests"
+export SPEC_RUNNER_DIR
+
+# The harness is GENERATED, never committed: it embeds two absolute paths
+# that are facts of this machine, not of the bundle.
+sh "$BUNDLE/tests/gen-harness.sh" "$X_ROOT" "$BUNDLE"
+
+LANG_LIB="$BUNDLE/tests/lib/harness.gen.x"
+# SPEC_PATH is env-overridable so a single spec file can be run in isolation.
+SPEC_PATH="${SPEC_PATH:-$BUNDLE/tests/specs}"
+
+# The list shows times in local time: the specs read them in UTC, as CI does.
+TZ=UTC
+export TZ
+
+# One spec file per process, with the platform's own object ceiling.
+export SPEC_BATCH="${SPEC_BATCH:-1}"
+
+. "$X_ROOT/tests/spec-runner.sh"

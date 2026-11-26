@@ -1,0 +1,28 @@
+#!/bin/sh
+# # x-mail -- a mail client on x-lang
+#
+# ## tests/gen-harness.sh -- shim onto the bundle kit's harness generator
+#
+# @description Writes tests/lib/harness.gen.x with the platform's generator:
+#   the dialect bundle.xon declares, booted, then the
+#   bundle's own tests/harness.x.
+# @author [Jon Ruttan](jonruttan@gmail.com)
+# @copyright 2026 Jon Ruttan
+# @license MIT No Attribution (MIT-0)
+#
+# Usage: gen-harness.sh X_ROOT BUNDLE
+#
+# The platform ships the generator; a bundle does not vendor it.  X_BUNDLE_KIT
+# overrides where the kit is, as it does for tests/spec-gate.sh.
+set -e
+
+X_ROOT="$1"
+BUNDLE="$2"
+
+KIT="${X_BUNDLE_KIT:-$X_ROOT/tools/bundle-kit}"
+[ -f "$KIT/gen-harness.sh" ] || {
+	echo "x-mail: no harness generator at $KIT -- set X_BUNDLE_KIT, or point X at an x-lang checkout" >&2
+	exit 2
+}
+
+BUNDLE="$BUNDLE" X="${X:-x}" sh "$KIT/gen-harness.sh"
