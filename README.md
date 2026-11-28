@@ -49,7 +49,11 @@ make install
 
 ```sh
 make check
+make card
 ```
+
+[docs/card.md](docs/card.md) is the card: the options, the panes and the keys
+in tables, and the rows `make card` runs.
 
 ## Licence
 
